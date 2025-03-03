@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from 'axios';
 
 function CreateNewChecklist({
   allTasks,
@@ -13,15 +14,23 @@ function CreateNewChecklist({
   const [editIndex, setEditIndex] = useState();
   const [editTask, setEditTask] = useState();
   const handleAddTask = () => {
-    setCheckList((prev) => [...prev, { ischecked: false, task: task }]);
+    setCheckList((prev) => [...prev, { isChecked: false, task: task }]);
     setTask("");
   };
-  const handleAddCheckList = () => {
+  const handleAddCheckList = async () => {
     if (title.trim() && checkList[0].task) {
-      setAllTasks((prev) => [
-        ...prev,
-        { status: false, taskType, title, checkList },
-      ]);
+      const newTask={
+        type:taskType,
+        title,
+        checklist:checkList
+      }
+      try {
+        const response= await axios.post("http://localhost:3000/tasks/create", newTask)
+        console.log('here')
+            setAllTasks((prev)=>[...prev,response.data])
+      } catch (error) {
+        console.log('Adding new task faild',error)
+      }
       setIsCreateNewActive(false);
       console.log(allTasks);
     } else alert("Title and Atleast one task is must");

@@ -1,18 +1,23 @@
 import React from "react";
+import axios from "axios"
 
-function DoneTasksDisplayHandler({ doneTasks, setDoneTasks }) {
-  const handleDelete = (index) => {
-    const newObj = doneTasks.filter((_, i) => i !== index);
-    setDoneTasks(newObj);
+function DoneTasksDisplayHandler({ doneTasks, setAllTasks }) {
+  const handleDelete = async (taskId) => {
+    try {
+      await axios.delete(`http://localhost:3000/tasks/delete/${taskId}`);
+      setAllTasks((prev) => prev.filter((task) => task._id !== taskId));
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
   };
 
   return (
     <div className="bg-gray-100 h-screen m-2 rounded-lg shadow-xl w-screen">
       <div className="grid grid-cols-4 gap-4 m-2">
-        {doneTasks &&
-          doneTasks.map((task, taskIndex) => (
+        {Array.isArray(doneTasks) &&
+          doneTasks.map((task) => (
             <div
-              key={taskIndex}
+              key={task._id}
               className="h-64 w-56 bg-gray-200 shadow-lg rounded-lg"
             >
               <div className="h-64 w-56 bg-gray-200 shadow-lg rounded-lg  relative">
@@ -21,7 +26,7 @@ function DoneTasksDisplayHandler({ doneTasks, setDoneTasks }) {
                 </div>
                 <div className="text-gray-500 m-2">{task.title}</div>
 
-                {task.taskType == "description" ? (
+                {task.type == "description" ? (
                   <>
                     <div className="text-gray-700 font-bold text-2xl m-2">
                       Description:
@@ -30,7 +35,7 @@ function DoneTasksDisplayHandler({ doneTasks, setDoneTasks }) {
 
                     <div className="absolute bottom-2 left-0 right-0 flex justify-between px-2">
                       <button
-                        onClick={() => handleDelete(taskIndex)}
+                        onClick={() => handleDelete(task._id)}
                         className="bg-gray-700 text-gray-100 p-2 rounded-md cursor-pointer hover:bg-gray-900"
                       >
                         Delete
@@ -39,26 +44,24 @@ function DoneTasksDisplayHandler({ doneTasks, setDoneTasks }) {
                   </>
                 ) : (
                   <>
-                    {" "}
                     <ul className="list-disc ml-5">
-                      {task.checkList &&
-                        task.checkList.map((list, index) => (
-                          <li key={index}>
-                            - <s>{list.task}</s>
+                      {task.checklist &&
+                        task.checklist.map((list) => (
+                          <li key={list._id}>
+                              <>
+                                - <s className="text-gray-500">{list.task}</s>
+                              </>
                           </li>
                         ))}
                     </ul>
-                    <div className="absolute bottom-2 left-0 right-0 flex justify-between px-2">
-                      <button
-                        className="bg-gray-700 text-gray-100 p-2 rounded-md cursor-pointer hover:bg-gray-900"
-                        onClick={() => handleDelete(taskIndex)}
-                      >
-                        Delete
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => handleDelete(task._id)}
+                      className="bg-gray-700 text-gray-100 p-2 rounded-md cursor-pointer text-center absolute bottom-2 flex justify-between px-2 ml-2 hover:bg-gray-900"
+                    >
+                      Delete
+                    </button>
                   </>
                 )}
-                {/* {task.taskType == "todo"  &&  } */}
               </div>
             </div>
           ))}

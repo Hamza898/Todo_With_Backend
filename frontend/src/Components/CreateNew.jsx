@@ -20,7 +20,7 @@ function CreateNew({ allTasks, setAllTasks, setIsCreateNewActive }) {
             className="lg:ml-100 sm:ml-50  bg-gray-800 text-white rounded-md mt-1 p-1 text-sm"
           >
             <option value="description">Description Style</option>
-            <option value="todo">ToDo Style</option>
+            <option value="checklist">ToDo Style</option>
           </select>
         </div>
         <input
@@ -39,7 +39,7 @@ function CreateNew({ allTasks, setAllTasks, setIsCreateNewActive }) {
             setIsCreateNewActive={setIsCreateNewActive}
           />
         )}
-        {taskType === "todo" && (
+        {taskType === "checklist" && (
           <CreateNewChecklist
             allTasks={allTasks}
             taskType={taskType}

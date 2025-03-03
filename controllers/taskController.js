@@ -62,7 +62,7 @@ exports.getAll = async (req, res) => {
     const tasks = await Task.find();
     res.json(tasks);
   } catch (error) {
-    return res.status(404).send("There are no tasks");
+    return res.status(500).send(error.message);
   }
 };
 
@@ -75,19 +75,59 @@ exports.getOne = async (req, res) => {
     }
     res.json(task);
   } catch (error) {
-    return res.status(404).send("There are no tasks");
+    return res.status(500).send(error.message);
   }
 };
 
-exports.removeFromChecklist = async (req,res)=>{
-    const {taskId , id}=req.params
-    try {
-     const data= await Task.findById(taskId)
-     data.checklist=data.checklist.filter(list=> id!=list.id)
-     await data.save()
-     res.json(data)
-
-    } catch (error) {
-        
+exports.removeFromChecklist = async (req, res) => {
+  const { taskId, id } = req.params;
+  try {
+    const data = await Task.findById(taskId);
+    data.checklist = data.checklist.filter((list) => id != list.id);
+    await data.save();
+    res.json(data);
+  } catch (error) {
+    return res.status(500).send(error.message);
+  }
+};
+exports.updateStatus = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const task = await Task.findById(id);
+    if (task) {
+      task.isCompleted = true;
+      task.save();
     }
-}
+    res.json(task);
+  } catch (error) {
+    return res.status(500).send(error.message);
+  }
+};
+exports.updateIsChecked = async (req, res) => {
+  const { id, listId } = req.params;
+
+  try {
+    let task = await Task.findById(id);
+    console.log("id-s", id, listId);
+    console.log("again id", task.checklist[0].id);
+
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    let checklistItem = task.checklist.find((li) => li._id.toString() === listId);
+
+    if (!checklistItem) {
+      return res.status(404).json({ message: "Checklist item not found" });
+    }
+
+    checklistItem.isChecked = true;
+
+    await task.save();
+
+    res.json({ message: "Checklist item updated successfully", checklistItem });
+  } catch (error) {
+    console.log("Cannot make it checked", error);
+    return res.status(500).send(error.message);
+  }
+};

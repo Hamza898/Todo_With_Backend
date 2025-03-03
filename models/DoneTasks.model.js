@@ -1,13 +1,14 @@
 const mongoose = require("mongoose");
 
-const taskSchema = new mongoose.Schema({
+const doneTaskSchema = new mongoose.Schema({
     title: {
         type: String,
         required: true
     },
     type: {
         type: String,
-        defaut: 'description'
+        required: true,
+        default: 'description'
     },
     isCompleted: {
         type: Boolean,
@@ -22,11 +23,11 @@ const taskSchema = new mongoose.Schema({
             isChecked: {
                 type: Boolean, default: false
             },
-            task: {
+            taskName: {
                 type: String, required: true
             }
         }
     ]
 });
 
-module.exports = mongoose.model("Task", taskSchema);
+module.exports = mongoose.model("DoneTask", doneTaskSchema);
